@@ -7,6 +7,10 @@ router.get("/balance", authMiddleware, async (req, res) => {
   const account = await Account.findOne({ userId: req.userId });
   res.json({ balance: account.balance });
 });
+router.get("/account-summary", authMiddleware, async (req, res) => {
+  const account = await Account.findOne({ userId: req.userId });
+  res.json({ account });
+});
 router.post("/transfer", authMiddleware, async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();

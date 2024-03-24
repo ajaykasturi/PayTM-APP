@@ -45,7 +45,11 @@ router.post("/signup", async (req, res) => {
   //------
   const token = jwt.sign({ userId }, JWT_SECRET);
 
-  res.status(200).json({ message: "User created successfully", token });
+  res.status(200).json({
+    message: "User created successfully",
+    token,
+    firstName: validator.data.firstName,
+  });
 });
 
 router.post("/signin", async (req, res) => {
@@ -58,7 +62,7 @@ router.post("/signin", async (req, res) => {
   const user = await User.findOne(validator.data);
   if (user) {
     const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-    return res.status(200).json({ token });
+    return res.status(200).json({ token, firstName: user.firstName });
   }
   res.status(411).json({
     message: "Error while logging in",
@@ -85,7 +89,7 @@ router.put("/", authMiddleware, async (req, res) => {
   });
 });
 
-router.get("/bulk", async (req, res) => {
+router.get("/bulk", authMiddleware, async (req, res) => {
   const filter = req.query.filter || "";
   const users = await User.find({
     $or: [
@@ -94,12 +98,14 @@ router.get("/bulk", async (req, res) => {
     ],
   });
   res.status(200).json({
-    users: users.map((user) => ({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      username: user.username,
-      id: user._id,
-    })),
+    users: users
+      .filter((user) => user._id != req.userId)
+      .map((user) => ({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        id: user._id,
+      })),
   });
 });
 
