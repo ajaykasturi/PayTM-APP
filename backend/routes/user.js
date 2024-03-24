@@ -1,6 +1,6 @@
 const express = require("express");
 const zod = require("zod");
-const { User } = require("../db");
+const { User, Account } = require("../db");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 const router = express.Router();
@@ -24,7 +24,9 @@ router.post("/signup", async (req, res) => {
       .json({ message: "Email already taken / Incorrect inputs" });
   }
 
-  const existingUser = await findOne({ username: validator.data.username });
+  const existingUser = await User.findOne({
+    username: validator.data.username,
+  });
 
   if (existingUser) {
     return res
@@ -34,7 +36,13 @@ router.post("/signup", async (req, res) => {
 
   const user = await User.create(validator.data);
   const userId = user._id;
-
+  //------
+  //create bank acount
+  await Account.create({
+    userId,
+    balance: parseInt(100 + Math.random() * (1000 - 100)),
+  });
+  //------
   const token = jwt.sign({ userId }, JWT_SECRET);
 
   res.status(200).json({ message: "User created successfully", token });
@@ -79,14 +87,12 @@ router.put("/", authMiddleware, async (req, res) => {
 
 router.get("/bulk", async (req, res) => {
   const filter = req.query.filter || "";
-
   const users = await User.find({
     $or: [
       { firstName: { $regex: filter, $options: "i" } },
       { lastName: { $regex: filter, $options: "i" } },
     ],
   });
-
   res.status(200).json({
     users: users.map((user) => ({
       firstName: user.firstName,

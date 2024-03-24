@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 //connect to mongodb cluster
 mongoose.connect(process.env.DATABASE_URL);
-
 // Create a Schema for Users
 const userSchema = new mongoose.Schema({
   username: {
