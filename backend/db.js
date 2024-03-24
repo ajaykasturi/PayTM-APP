@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
-
+require("dotenv").config();
 //connect to mongodb cluster
-mongoose.connect(
-  "mongodb+srv://ajay:08062001@cluster0.d3g2vlq.mongodb.net/paytm/"
-);
+mongoose.connect(process.env.DATABASE_URL);
 
 // Create a Schema for Users
 const userSchema = new mongoose.Schema({
