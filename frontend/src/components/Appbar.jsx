@@ -12,7 +12,7 @@ const Appbar = () => {
         </div>
         <div className="rounded-full h-12 w-12 bg-slate-200 flex justify-center mt-1 mr-3">
           <div className="flex flex-col justify-center h-full text-xl">
-            {localStorage.getItem("firstName").toUpperCase().charAt(0)}
+            {localStorage.getItem("firstName")?.toUpperCase().charAt(0)}
           </div>
         </div>
       </div>
